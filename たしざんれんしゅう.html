@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -12,21 +12,27 @@ body{
   font-family:"Hiragino Sans","Yu Gothic",sans-serif;
   background:linear-gradient(180deg,#7dd3fc,#fde68a);
   height:100dvh;
+  width:100vw;
   display:flex;
   justify-content:center;
+  align-items:flex-start;
   overflow:hidden;
 }
 .app{
   width:100%;
   max-width:430px;
-  height:100dvh;
+  height:auto;
   background:#fffaf0;
   padding:clamp(10px,3vmin,20px);
   display:flex;
   flex-direction:column;
+  padding-bottom:max(clamp(10px,3vmin,20px), env(safe-area-inset-bottom));
+  transform-origin:top center;
+}
+.no-js .app{
+  max-height:100dvh;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
-  padding-bottom:max(clamp(10px,3vmin,20px), env(safe-area-inset-bottom));
 }
 .header{
   position:relative;
@@ -307,6 +313,8 @@ button:active{transform:translateY(3px)}
 <div class="credit">Produced by Shimofuri</div>
 
 <script>
+document.documentElement.classList.remove("no-js");
+
 let num1=0,num2=0,score=0,timeLeft=60,timer=null,playing=false;
 let combo=0;
 let noMistake=true;
@@ -619,6 +627,28 @@ function starEffect(){
 }
 
 resetGame();
+
+/* 画面サイズ（横幅・たて高さ）に合わせて全体を自動で縮小表示する */
+function fitToScreen(){
+  const app=document.querySelector(".app");
+  app.style.transform="scale(1)";
+
+  const naturalWidth=app.offsetWidth;
+  const naturalHeight=app.scrollHeight;
+  const availWidth=window.innerWidth;
+  const availHeight=window.visualViewport?window.visualViewport.height:window.innerHeight;
+
+  const scale=Math.min(availWidth/naturalWidth,availHeight/naturalHeight,1);
+  app.style.transform="scale("+scale+")";
+}
+
+window.addEventListener("load",fitToScreen);
+window.addEventListener("resize",fitToScreen);
+window.addEventListener("orientationchange",()=>setTimeout(fitToScreen,150));
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",fitToScreen);
+}
+fitToScreen();
 </script>
 
 </body>
